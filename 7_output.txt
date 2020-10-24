@@ -36,6 +36,9 @@ Newton method
 Derivatives matrix:
 -cos(x - 1)  1
 1            cos(y + 1)
+
+Alpha = 2.71828 Lambda = 0.50000
+
                                Error                                                Jacobian 
   Itr |    x     |     y     | Estimate     |      F1    |      F2    |     FF    | norm     |   Alpha
    1  | 1.700000 |  0.500000 | 2.884360e-01 | -1.558e-01 | -9.749e-02 | 3.377e-02 | 0.662066 | 0.339785

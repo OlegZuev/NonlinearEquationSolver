@@ -52,6 +52,9 @@ Newton method
 Derivatives matrix:
 cos(x + 0.5) -1
 1            sin(y - 2)
+
+Alpha = 2.71828 Lambda = 0.50000
+
                                Error                                                Jacobian 
   Itr |    x     |     y     | Estimate     |      F1    |      F2    |     FF    | norm     |   Alpha
    1  | 0.500000 | -0.100000 | 3.448639e-01 | -5.853e-02 | -4.846e-03 | 3.449e-03 | 0.823600 | 0.679570

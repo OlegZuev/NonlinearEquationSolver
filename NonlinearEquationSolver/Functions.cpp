@@ -256,10 +256,12 @@ void gradient_descent_method(double x, double y, std::ostream& ostr) {
 	double lambda = 0.5;
 	double alpha;
 
-	//Header
 	ostr << "Newton method" << std::endl << std::endl;
 	ostr << "Derivatives matrix:" << std::endl;
 	print_derivatives_matrix(ostr);
+	ostr << std::endl << "Alpha = " << exp(1) << " Lambda = " << 0.5 << std::endl << std::endl;
+
+	//Header
 	ostr << "                               Error                                                Jacobian " << std::
 		endl;
 	ostr << "  Itr |    x     |     y     | Estimate     |      F1    |      F2    |     FF    | norm     |   Alpha" <<
