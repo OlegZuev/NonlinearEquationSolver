@@ -1,18 +1,18 @@
 #include "Functions.h"
 #include <utility>
 #include <iomanip>
-#include <math.h>
+#include <cmath>
 
 double jacobian[2][2];
 double derivatives_matrix[2][2];
 
 /**
- * Find error estimate
+ * Find error estimate for arguments
  */
-double error_estimate(double q, double x, double next_x, double y, double next_y) {
+double error_estimate_third_norm(double x, double next_x, double y, double next_y) {
 	double dif_x = abs(x - next_x);
 	double dif_y = abs(y - next_y);
-	return (dif_x > dif_y ? dif_x : dif_y) * q / (1 - q);
+	return sqrt(dif_x * dif_x + dif_y * dif_y);
 }
 
 /**
@@ -271,12 +271,11 @@ void simple_iteration_method(double x, double y, std::ostream& ostr) {
 
 		compute_jacobian(next_x, next_y);
 		double q = get_norm_jacobian();
-		error = error_estimate(q, x, next_x, y, next_y);
+		error = error_estimate_third_norm(x, next_x, y, next_y);
 
-		ostr << std::fixed << std::setw(4) << itr << "  | " << std::setprecision(PRECISION) << std::setw(8) << x << " | " << std::setw(9) << y << " | "
-			<< std::scientific << error << " | " << std::setprecision(PRECISION / 2) << std::setw(10) << func1(x, y)
-			<< " | " << std::setw(10) << func2(x,y) << " | " << std::setprecision(5) << std::fixed << q << std::
-			endl;
+		ostr << std::fixed << std::setw(4) << itr << "  | " << std::setprecision(PRECISION) << std::setw(8) << next_x << " | " << std::setw(9) << next_y <<
+			" | " << std::setw(10) << std::scientific << sqrt(func1(next_x, next_y) * func1(next_x, next_y) + func2(next_x, next_y) * func2(next_x, next_y)) << " | " << std::setprecision(PRECISION / 2) << std::
+			setw(10) << func1(next_x, next_y) << " | " << std::setw(10) << func2(next_x, next_y) << " | " << std::fixed << std::setprecision(PRECISION) << q << std::endl;
 
 		x = next_x;
 		y = next_y;
@@ -295,7 +294,7 @@ void newton_method(double x, double y, std::ostream& ostr) {
 	ostr << "Derivatives matrix:" << std::endl;
 	print_derivatives_matrix(ostr);
 	ostr << "                               Error" << std::endl;
-	ostr << "  Itr |    x     |     y     | Estimate     |      F1    |      F2    | Jacobian norm " << std::endl;
+	ostr << "  Itr |    x     |     y     | Estimate     |      F1    |      F2    " << std::endl;
 
 	do {
 		itr++;
@@ -309,14 +308,11 @@ void newton_method(double x, double y, std::ostream& ostr) {
 		double next_x = x - (derivatives_matrix[0][0] * computed_func1 + derivatives_matrix[0][1] * computed_func2);
 		double next_y = y - (derivatives_matrix[1][0] * computed_func1 + derivatives_matrix[1][1] * computed_func2);
 
-		compute_jacobian(next_x, next_y);
-		double q = get_norm_jacobian();
-		error = error_estimate(q, x, next_x, y, next_y);
+		error = error_estimate_third_norm(x, next_x, y, next_y);
 
-		ostr << std::fixed << std::setw(4) << itr << "  | " << std::setprecision(PRECISION) << std::setw(8) << x << " | " << std::setw(9) << y << " | "
-			<< std::scientific << error << " | " << std::setprecision(PRECISION / 2) << std::setw(10) << computed_func1
-			<< " | " << std::setw(10) << computed_func2 << " | " << std::setprecision(5) << std::fixed << q << std::
-			endl;
+		ostr << std::fixed << std::setw(4) << itr << "  | " << std::setprecision(PRECISION) << std::setw(8) << next_x << " | " << std::setw(9) << next_y <<
+			" | " << std::setw(10) << std::scientific << sqrt(func1(next_x, next_y) * func1(next_x, next_y) + func2(next_x, next_y) * func2(next_x, next_y)) << " | " << std::setprecision(PRECISION / 2) << std::
+			setw(10) << func1(next_x, next_y) << " | " << std::setw(10) << func2(next_x, next_y) << std::endl;
 
 		x = next_x;
 		y = next_y;
@@ -329,6 +325,7 @@ void newton_method(double x, double y, std::ostream& ostr) {
 void gradient_descent_method(double x, double y, std::ostream& ostr) {
 	double error;
 	int itr = 0;
+	int k = 0;
 	double vector_of_derivatives[2];
 	double lambda = 0.5;
 	double alpha;
@@ -336,18 +333,19 @@ void gradient_descent_method(double x, double y, std::ostream& ostr) {
 	ostr << "Newton method" << std::endl << std::endl;
 	ostr << "Derivatives matrix:" << std::endl;
 	print_derivatives_matrix(ostr);
-	ostr << std::endl << "Alpha = " << exp(1) << " Lambda = " << 0.5 << std::endl << std::endl;
+	ostr << std::endl << std::fixed << "Alpha0 = " << 1 << " Lambda0 = " << 0.5 << std::endl << std::endl;
 
 	//Header
-	ostr << "                               Error                                                Jacobian " << std::
+	ostr << "                               Error" << std::
 		endl;
-	ostr << "  Itr |    x     |     y     | Estimate     |      F1    |      F2    |     FF    | norm     |   Alpha" <<
+	ostr << "  Itr |    x     |     y     | Estimate     |      F1    |      F2    |     FF    | k |   Alpha" <<
 		std::endl;
 
 	do {
 		itr++;
-
-		alpha = exp(1); // e = 2.71...
+		// alpha = exp(1); // e = 2.71...
+		alpha = 1;
+		k = 0;
 
 		double computed_func1 = func1(x, y);
 		double computed_func2 = func2(x, y);
@@ -359,20 +357,20 @@ void gradient_descent_method(double x, double y, std::ostream& ostr) {
 			func2_derivative_y(x, y);
 
 		while (func_for_minimize(x - alpha * vector_of_derivatives[0], y - alpha * vector_of_derivatives[1]) >=
-			computed_func_for_minimize)
+			computed_func_for_minimize) {
 			alpha *= lambda;
+			k++;
+		}
 
 		double next_x = x - alpha * vector_of_derivatives[0];
 		double next_y = y - alpha * vector_of_derivatives[1];
 
-		compute_jacobian(next_x, next_y);
-		double q = get_norm_jacobian();
-		error = error_estimate(q, x, next_x, y, next_y);
+		error = error_estimate_third_norm(x, next_x, y, next_y); 
 
-		ostr << std::fixed << std::setw(4)<< itr << "  | " << std::setprecision(PRECISION) << std::setw(8) << x << " | " << std::setw(9) << y <<
-			" | " << std::setw(10) << std::scientific << error << " | " << std::setprecision(PRECISION / 2) << std::
-			setw(10) << computed_func1 << " | " << std::setw(10) << computed_func2 << " | " <<
-			computed_func_for_minimize << " | " << std::fixed << std::setprecision(PRECISION) << q << " | " << alpha <<
+		ostr << std::fixed << std::setw(4)<< itr << "  | " << std::setprecision(PRECISION) << std::setw(8) << next_x << " | " << std::setw(9) << next_y <<
+			" | " << std::setw(10) << std::scientific << sqrt( func1(next_x, next_y) * func1(next_x, next_y) + func2(next_x, next_y) *  func2(next_x, next_y)) << " | " << std::setprecision(PRECISION / 2) << std::
+			setw(10) << func1(next_x, next_y) << " | " << std::setw(10) <<  func2(next_x, next_y) << " | " <<
+			func_for_minimize(next_x, next_y) << " | " << std::fixed << std::setprecision(PRECISION) << k << " | " << alpha <<
 			std::endl;
 
 		x = next_x;

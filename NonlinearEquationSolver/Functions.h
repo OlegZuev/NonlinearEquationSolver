@@ -2,14 +2,14 @@
 #include <iostream>
 #define PRECISION 6
 
-const int variant = 0;
+const int variant = 7;
 const int n = 2;
 const double eps = 1E-4;
 
 class Vector;
 void print_header(std::ostream& ostr);
 
-double error_estimate(double q, double x, double next_x, double y, double next_y);
+double error_estimate_third_norm(double x, double next_x, double y, double next_y);
 
 void set_x0_y0(double& x, double& y);
 
