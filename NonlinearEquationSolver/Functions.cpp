@@ -47,6 +47,10 @@ void set_x0_y0(double& x, double& y) {
 		x = 1.7;
 		y = 0.5;
 		return;
+	case 0:
+		x = -0.1;
+		y = 0.5;
+		return;
 	}
 
 	throw std::invalid_argument("Invalid variant");
@@ -68,6 +72,12 @@ void compute_jacobian(double x, double y) {
 		jacobian[0][1] = 0;
 		jacobian[1][0] = 0;
 		jacobian[1][1] = cos(y + 1);
+		return;
+	case 0:
+		jacobian[0][0] = 0;
+		jacobian[0][1] = cos(y + 0.5);
+		jacobian[1][0] = sin(x - 2);
+		jacobian[1][1] = 0;
 		return;
 	}
 
@@ -107,6 +117,8 @@ double func1(double x, double y) {
 		return sin(x + 0.5) - y - 1; // y = sin(x + 0.5) - 1	
 	case 7:
 		return sin(x - 1) - 1.3 + y; // y = -sin(x - 1) + 1.3
+	case 0:
+		return  +1 - sin(y + 0.5) + x;
 	}
 
 	throw std::invalid_argument("Invalid variant");
@@ -121,6 +133,8 @@ double func1_derivative_x(double x, double y) {
 		return cos(x + 0.5); // sin(x + 0.5) - y - 1;	
 	case 7:
 		return cos(x - 1); //sin(x - 1) - 1.3 + y;
+	case 0:
+		return 1; //  +1 - sin(y + 0.5) + x;
 	}
 
 	throw std::invalid_argument("Invalid variant");
@@ -135,6 +149,8 @@ double func1_derivative_y(double x, double y) {
 		return -1; // sin(x + 0.5) - y - 1;	
 	case 7:
 		return 1; //sin(x - 1) - 1.3 + y;
+	case 0:
+		return -cos(y + 0.5); //   +1 - sin(y + 0.5) + x;
 	}
 
 	throw std::invalid_argument("Invalid variant");
@@ -149,6 +165,8 @@ double func2(double x, double y) {
 		return cos(y - 2) + x; // x = -cos(y - 2)
 	case 7:
 		return x - sin(y + 1) - 0.8; // x = sin(y + 1) + 0.8
+	case 0:
+		return cos(x - 2) + y;
 	}
 
 	throw std::invalid_argument("Invalid variant");
@@ -163,6 +181,8 @@ double func2_derivative_x(double x, double y) {
 		return 1; // cos(y - 2) + x;
 	case 7:
 		return 1; //x - sin(y + 1) - 0.8;
+	case 7:
+		return -sin(x - 2); //  cos(x - 2) + y;
 	}
 
 	throw std::invalid_argument("Invalid variant");
@@ -177,6 +197,8 @@ double func2_derivative_y(double x, double y) {
 		return -sin(y - 2); // cos(y - 2) + x;
 	case 7:
 		return -cos(y + 1); //x - sin(y + 1) - 0.8;
+	case 0:
+		return 1; //  cos(x - 2) + y;
 	}
 
 	throw std::invalid_argument("Invalid variant");
@@ -191,6 +213,8 @@ double compute_next_x(double y) {
 		return -cos(y - 2);
 	case 7:
 		return sin(y + 1) + 0.8;
+	case 0:
+		return -1 + sin(y + 0.5);
 	}
 
 	throw std::invalid_argument("Invalid variant");
@@ -205,6 +229,8 @@ double compute_next_y(double x) {
 		return sin(x + 0.5) - 1;
 	case 7:
 		return -sin(x - 1) + 1.3;
+	case 0:
+		return -cos(x - 2);
 	}
 
 	throw std::invalid_argument("Invalid variant");
@@ -373,12 +399,16 @@ void print_computed_jacobian(std::ostream& ostr) {
 void print_nonlinear_system(std::ostream& ostr) {
 	switch (variant) {
 	case 5:
-		ostr << "Fi1(x,y)=sin(x + 0.5) - y - 1" << std::endl;
-		ostr << "Fi2(x,y)=cos(y - 2) + x" << std::endl;
+		ostr << "Fi1(x,y)=sin(x + 0.5) - 1" << std::endl;
+		ostr << "Fi2(x,y)=-cos(y - 2)" << std::endl;
 		return;
 	case 7:
-		ostr << "Fi1(x,y)=sin(x - 1) - 1.3 + y" << std::endl;
-		ostr << "Fi2(x,y)=x - sin(y + 1) - 0.8" << std::endl;
+		ostr << "Fi1(x,y)=-sin(x - 1) + 1.3" << std::endl;
+		ostr << "Fi2(x,y)=sin(y + 1) + 0.8" << std::endl;
+		return;
+	case 0:
+		ostr << "Fi1(x,y)=-1+sin(y+0.5)" << std::endl;
+		ostr << "Fi2(x,y)=-c0s(x-2)" << std::endl;
 		return;
 	}
 
@@ -398,6 +428,10 @@ void print_jacobian(std::ostream& ostr) {
 		ostr << "-cos(x - 1)  0" << std::endl;
 		ostr << "0            cos(y + 1)" << std::endl;
 		return;
+	case 0:
+		ostr << "0.0  ; cos(y+0.5)" << std::endl;
+		ostr << "sin(x-2);  0.0 " << std::endl;
+		return;
 	}
 
 	throw std::invalid_argument("Invalid variant");
@@ -415,6 +449,10 @@ void print_derivatives_matrix(std::ostream& ostr) {
 	case 7:
 		ostr << "-cos(x - 1)  1" << std::endl;
 		ostr << "1            cos(y + 1)" << std::endl;
+		return;
+	case 0:
+		ostr << " 1.0  ; -cos(y+0.5)" << std::endl;
+		ostr << " -sin(x-2);  1.0 " << std::endl;
 		return;
 	}
 
