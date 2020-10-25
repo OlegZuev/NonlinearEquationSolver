@@ -181,7 +181,7 @@ double func2_derivative_x(double x, double y) {
 		return 1; // cos(y - 2) + x;
 	case 7:
 		return 1; //x - sin(y + 1) - 0.8;
-	case 7:
+	case 0:
 		return -sin(x - 2); //  cos(x - 2) + y;
 	}
 

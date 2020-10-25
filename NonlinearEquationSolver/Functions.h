@@ -2,7 +2,7 @@
 #include <iostream>
 #define PRECISION 6
 
-const int variant = 7;
+const int variant = 0;
 const int n = 2;
 const double eps = 1E-4;
 
