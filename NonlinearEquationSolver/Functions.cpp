@@ -15,6 +15,9 @@ double error_estimate(double q, double x, double next_x, double y, double next_y
 	return (dif_x > dif_y ? dif_x : dif_y) * q / (1 - q);
 }
 
+/**
+ * Compute first norm of jacobian
+ */
 double get_norm_jacobian() {
 	double result = -1;
 	for (int i = 0; i < n; ++i) {
@@ -31,6 +34,9 @@ double get_norm_jacobian() {
 	return result;
 }
 
+/**
+ * Get into x and y initial value
+ */
 void set_x0_y0(double& x, double& y) {
 	switch (variant) {
 	case 5:
@@ -46,6 +52,9 @@ void set_x0_y0(double& x, double& y) {
 	throw std::invalid_argument("Invalid variant");
 }
 
+/**
+ *	Ñompute jacobian in accordance with the function
+ */
 void compute_jacobian(double x, double y) {
 	switch (variant) {
 	case 5:
@@ -65,6 +74,9 @@ void compute_jacobian(double x, double y) {
 	throw std::invalid_argument("Invalid variant");
 }
 
+/**
+ * Ñompute derivatives matrix in accordance with the function
+ */
 void compute_derivatives_matrix(double x, double y) {
 	derivatives_matrix[0][0] = func1_derivative_x(x, y);
 	derivatives_matrix[0][1] = func1_derivative_y(x, y);
@@ -72,6 +84,9 @@ void compute_derivatives_matrix(double x, double y) {
 	derivatives_matrix[1][1] = func2_derivative_y(x, y);
 }
 
+/**
+ * Reverse derivatives matrix
+ */
 void reverse_derivatives_matrix() {
 	double det = derivatives_matrix[0][0] * derivatives_matrix[1][1] - derivatives_matrix[0][1] * derivatives_matrix[1][
 		0];
@@ -83,6 +98,9 @@ void reverse_derivatives_matrix() {
 	}
 }
 
+/**
+ * First function in system (depending on the variant)
+ */
 double func1(double x, double y) {
 	switch (variant) {
 	case 5:
@@ -94,6 +112,9 @@ double func1(double x, double y) {
 	throw std::invalid_argument("Invalid variant");
 }
 
+/**
+ * Derivative of the first function in system by variable x (depending on the variant)
+ */
 double func1_derivative_x(double x, double y) {
 	switch (variant) {
 	case 5:
@@ -105,6 +126,9 @@ double func1_derivative_x(double x, double y) {
 	throw std::invalid_argument("Invalid variant");
 }
 
+/**
+ * Derivative of the first function in system by variable y (depending on the variant)
+ */
 double func1_derivative_y(double x, double y) {
 	switch (variant) {
 	case 5:
@@ -116,6 +140,9 @@ double func1_derivative_y(double x, double y) {
 	throw std::invalid_argument("Invalid variant");
 }
 
+/**
+ * Second function in system (depending on the variant)
+ */
 double func2(double x, double y) {
 	switch (variant) {
 	case 5:
@@ -127,6 +154,9 @@ double func2(double x, double y) {
 	throw std::invalid_argument("Invalid variant");
 }
 
+/**
+ * Derivative of the second function in system by variable x (depending on the variant)
+ */
 double func2_derivative_x(double x, double y) {
 	switch (variant) {
 	case 5:
@@ -138,6 +168,9 @@ double func2_derivative_x(double x, double y) {
 	throw std::invalid_argument("Invalid variant");
 }
 
+/**
+ * Derivative of the second function in system by variable y (depending on the variant)
+ */
 double func2_derivative_y(double x, double y) {
 	switch (variant) {
 	case 5:
@@ -149,6 +182,9 @@ double func2_derivative_y(double x, double y) {
 	throw std::invalid_argument("Invalid variant");
 }
 
+/**
+ * Compute next x for simple iteration method
+ */
 double compute_next_x(double y) {
 	switch (variant) {
 	case 5:
@@ -160,6 +196,9 @@ double compute_next_x(double y) {
 	throw std::invalid_argument("Invalid variant");
 }
 
+/**
+ * Compute next y for simple iteration method
+ */
 double compute_next_y(double x) {
 	switch (variant) {
 	case 5:
@@ -171,10 +210,16 @@ double compute_next_y(double x) {
 	throw std::invalid_argument("Invalid variant");
 }
 
+/**
+ * This function is used in gradient_descent_method for minimizations
+ */
 double func_for_minimize(double x, double y) {
 	return pow(func1(x, y), 2) + pow(func2(x, y), 2);
 }
 
+/**
+ * Simple iteration method for solving non linear equation
+ */
 void simple_iteration_method(double x, double y, std::ostream& ostr) {
 	double error;
 	int itr = 0;
@@ -212,6 +257,9 @@ void simple_iteration_method(double x, double y, std::ostream& ostr) {
 	} while (error > eps);
 }
 
+/**
+ * Newton method for solving non linear equation
+ */
 void newton_method(double x, double y, std::ostream& ostr) {
 	double error;
 	int itr = 0;
@@ -249,6 +297,9 @@ void newton_method(double x, double y, std::ostream& ostr) {
 	} while (error > eps);
 }
 
+/**
+ *  Gradient descent method for solving non linear equation
+ */
 void gradient_descent_method(double x, double y, std::ostream& ostr) {
 	double error;
 	int itr = 0;
@@ -303,6 +354,9 @@ void gradient_descent_method(double x, double y, std::ostream& ostr) {
 	} while (error > eps);
 }
 
+/**
+ * Print computed jacobian into ostr
+ */
 void print_computed_jacobian(std::ostream& ostr) {
 	for (int i = 0; i < n; ++i) {
 		for (int j = 0; j < n; ++j) {
@@ -313,6 +367,9 @@ void print_computed_jacobian(std::ostream& ostr) {
 	}
 }
 
+/**
+ * Print equations of the nonlinear system into ostr
+ */
 void print_nonlinear_system(std::ostream& ostr) {
 	switch (variant) {
 	case 5:
@@ -328,7 +385,9 @@ void print_nonlinear_system(std::ostream& ostr) {
 	throw std::invalid_argument("Invalid variant");
 }
 
-
+/**
+ * Print expressions of the jacobian into ostr
+ */
 void print_jacobian(std::ostream& ostr) {
 	switch (variant) {
 	case 5:
@@ -344,6 +403,9 @@ void print_jacobian(std::ostream& ostr) {
 	throw std::invalid_argument("Invalid variant");
 }
 
+/**
+ * Print expressions of the derivatives matrix into ostr
+ */
 void print_derivatives_matrix(std::ostream& ostr) {
 	switch (variant) {
 	case 5:
